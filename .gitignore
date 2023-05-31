@@ -1,0 +1,27 @@
+# Dependencies
+/node_modules
+
+# Build output
+/dist
+/out
+
+# Environment variables
+/.env
+
+# IDE and editor files
+/.vscode
+/.idea
+/.vs
+*.sublime-*
+
+# macOS metadata
+.DS_Store
+
+# Windows thumbnail cache files
+/Thumbs.db
+
+# Log files
+/*.log
+
+# Backup files
+*~

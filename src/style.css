@@ -1,0 +1,163 @@
+/* -------------------- THEMES -------------------- */
+
+:root[color-mode="light"] {
+    --primary: #6200ee;
+    --primaryVariant: #3700b3;
+    --secondary: #03dac6;
+    --secondaryVariant: #018786;
+    --onPrimary: #fff;
+    --onPrimaryVariant: #fff;
+    --onSecondary: #000;
+    --onSecondaryVariant: #fff;
+    --onBackground: #000;
+    --error: #b00020;
+    --onError: #fff;
+    --background: #fff;
+    --mainBackground: rgba(0, 0, 0, 0.05);
+}
+
+:root[color-mode="dark"] {
+    --primary: #bb86fc;
+    --primaryVariant: #3700b3;
+    --secondary: #03dac6;
+    --secondaryVariant: #03dac6;
+    --onPrimary: #000;
+    --onPrimaryVariant: #fff;
+    --onSecondary: #000;
+    --onSecondaryVariant: #000;
+    --onBackground: #fff;
+    --error: #cf6679;
+    --onError: #000;
+    --background: #121212;
+    --mainBackground: rgba(255, 255, 255, 0.05);
+}
+
+/* -------------------- GLOBAL -------------------- */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    height: 100vh;
+    font-family: Arial, sans-serif;
+    background-color: var(--background);
+    color: var(--onBackground);
+}
+
+/* -------------------- NAVBAR -------------------- */
+
+nav {
+    width: 100%;
+    background-color: var(--background);
+    padding: 20px 0;
+    margin-bottom: 20px;
+}
+
+nav ul {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+nav ul li {
+    list-style: none;
+    margin: 0 10px;
+}
+
+nav a {
+    text-decoration: none;
+    color: var(--primary);
+    padding: 15px 10px;
+    border-bottom: transparent 2px solid;
+    transition: all 0.3s ease-in-out;
+}
+
+nav a:hover,
+nav a:focus {
+    border-bottom: var(--primaryVariant) 2px solid;
+}
+
+nav a:hover.active,
+nav a:focus.active {
+    border-bottom: var(--primary) 2px solid;
+}
+
+.active {
+    font-weight: bold;
+    border-bottom: var(--primary) 2px solid;
+}
+
+/* -------------------- MAIN -------------------- */
+
+main {
+    width: 100% - 40px;
+    margin: 0 20px;
+    padding: 20px 20px;
+    border-radius: 15px;
+    background-color: var(--mainBackground);
+}
+
+h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+/* -------------------- SETTINGS -------------------- */
+
+/* CUSTOM SELECT */
+
+.customSelect {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+.customSelect select {
+    appearance: none;
+    padding: 8px 30px 8px 10px;
+    border: 2px solid var(--primary);
+    border-radius: 8px;
+    background-color: transparent;
+    color: var(--onBackground);
+    font-size: 16px;
+    cursor: pointer;
+    outline: none;
+}
+
+.customSelect select option {
+    background-color: var(--background);
+}
+
+.customSelect select::-ms-expand {
+    display: none;
+    /* Remove default arrow icon in IE/Edge */
+}
+
+.customSelect .selectIcon {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+/* CUSTOM DIRECTORY BUTTON */
+
+.directory-button {
+    /* Add your custom button styles here */
+    /* For example: */
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    background-color: var(--primary);
+    color: var(--onPrimary);
+    cursor: pointer;
+}
+
+#currentDirectoryText {
+    /* Add your custom text styles here */
+    /* For example: */
+    font-weight: bold;
+}
