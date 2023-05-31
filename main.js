@@ -11,10 +11,23 @@ let settings = {};
 function createWindow() {
     // Load the settings data from settings.json file
     const settingsPath = path.join(__dirname, 'settings.json');
+
+    // Read the settings file if it exists, otherwise create a new settings file
     try {
-        settings = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
+        // Read the settings file if it exists
+        if (fs.existsSync(settingsPath)) {
+            const settingsData = fs.readFileSync(settingsPath, 'utf-8');
+            settings = JSON.parse(settingsData);
+        } else {
+            // Create a new settings file if it doesn't exist and add default values
+            settings = {
+                theme: 'dark',
+                seriesPath: '/path/to/series'
+            };
+            fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2));
+        }
     } catch (err) {
-        // Handle error if settings file doesn't exist or is invalid
+        // Handle error if there are issues with the settings file
         console.error('Error reading settings file:', err);
     }
 
