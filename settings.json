@@ -1,4 +1,7 @@
 {
   "theme": "dark",
-  "seriesPath": "G:\\The 100"
+  "seriesPath": "G:\\The 100",
+  "currentEpisode": "Episode 01 - Pilot.mkv",
+  "currentSeason": "Season 1",
+  "currentTimestamp": 0
 }

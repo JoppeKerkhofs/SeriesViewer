@@ -22,7 +22,10 @@ function createWindow() {
             // Create a new settings file if it doesn't exist and add default values
             settings = {
                 theme: 'dark',
-                seriesPath: '/path/to/series'
+                seriesPath: '/path/to/series',
+                currentEpisode: '',
+                currentSeason: '',
+                currentTimestamp: 0
             };
             fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2));
         }

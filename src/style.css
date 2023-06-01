@@ -42,9 +42,17 @@
 
 body {
     height: 100vh;
+    max-width: 1920px;
+    margin: 0 auto;
     font-family: Arial, sans-serif;
     background-color: var(--background);
     color: var(--onBackground);
+}
+
+@media screen and (max-width: 768px) {
+    body {
+        font-size: 14px;
+    }
 }
 
 /* -------------------- NAVBAR -------------------- */
@@ -64,6 +72,7 @@ nav ul {
 nav ul li {
     list-style: none;
     margin: 0 10px;
+    height: 50px;
 }
 
 nav a {
@@ -72,6 +81,7 @@ nav a {
     padding: 15px 10px;
     border-bottom: transparent 2px solid;
     transition: all 0.3s ease-in-out;
+    outline: none;
 }
 
 nav a:hover,
@@ -89,6 +99,34 @@ nav a:focus.active {
     border-bottom: var(--primary) 2px solid;
 }
 
+@media screen and (max-width: 768px) {
+    nav ul {
+        flex-direction: column;
+    }
+
+    nav a {
+        border-left: transparent 2px solid;
+        border-bottom: none;
+    }
+
+    nav a:hover,
+    nav a:focus {
+        border-left: var(--primaryVariant) 2px solid;
+        border-bottom: none;
+    }
+
+    nav a:hover.active,
+    nav a:focus.active {
+        border-left: var(--primary) 2px solid;
+        border-bottom: none;
+    }
+
+    .active {
+        border-left: var(--primary) 2px solid;
+        border-bottom: none;
+    }
+}
+
 /* -------------------- MAIN -------------------- */
 
 main {
@@ -102,6 +140,69 @@ main {
 h1 {
     font-size: 24px;
     margin-bottom: 20px;
+}
+
+#seasonPicker {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#seasonPicker a {
+    margin: 0 10px 10px 0;
+    border-radius: 8px;
+    padding: 10px;
+    transition: all 0.3s ease-in-out;
+    outline: none;
+    cursor: pointer;
+}
+
+#seasonPicker img {
+    width: 200px;
+    aspect-ratio: 10/15;
+}
+
+#episodePicker {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+}
+
+#episodePicker a {
+    height: 40px;
+    color: var(--primary);
+    border-radius: 8px;
+    padding: 10px;
+    transition: all 0.3s ease-in-out;
+    outline: none;
+    cursor: pointer;
+}
+
+#episodePicker a:hover,
+#episodePicker a:focus {
+    background-color: var(--primaryVariant);
+    color: var(--onPrimaryVariant);
+}
+
+#episodePicker a.currentEpisode {
+    color: var(--secondary);
+}
+
+#episodePicker a.currentEpisode:hover,
+#episodePicker a.currentEpisode:focus {
+    background-color: var(--secondary);
+    color: var(--onSecondary);
+}
+
+@media screen and (max-width: 768px) {
+    #seasonPicker img {
+        width: 100px;
+    }
+}
+
+@media screen and (min-width: 1920px) {
+    #seasonPicker img {
+        width: 350px;
+    }
 }
 
 /* -------------------- SETTINGS -------------------- */
