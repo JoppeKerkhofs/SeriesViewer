@@ -41,14 +41,19 @@ function loadSeason(season) {
     episodes.forEach((episode) => {
         // remove the file extension from the episode name
         episodeName = episode.replace(".mkv", "");
+        // check if the episode has special characters in the name
+        if (episode.includes("'")) {
+            // replace the special characters with html entities
+            episode = episode.replace("'", "\'");
+        }
         let newButton;
         // check if the episode is the current episode
         if (episode === settings.currentEpisode) {
             // create the button with the current episode class
-            newButton = "<a class=\"currentEpisode\" onclick=\"loadEpisode(" + season + ", " + episode + ");\">Watch: " + episodeName + "</a>";
+            newButton = "<a class=\"currentEpisode\" onclick=\"loadEpisode('" + season + "', '" + escapeSingleQuotes(episode) + "');\">Watch: " + episodeName + "</a>";
         } else {
             // create the button
-            newButton = "<a onclick=\"loadEpisode(" + season + ", " + episode + ");\">Watch: " + episodeName + "</a>";
+            newButton = "<a onclick=\"loadEpisode('" + season + "', '" + escapeSingleQuotes(episode) + "');\">Watch: " + episodeName + "</a>";
         }
         // add the button to the episode picker
         episodePicker.innerHTML += newButton;
@@ -79,4 +84,19 @@ function getEpisodesForSeason(seriesPath, season) {
         return episodeFile;
     });
     return episodeNames;
+}
+
+function loadEpisode(season, episode) {
+    // set the current episode and the current season
+    settings.currentEpisode = episode;
+    settings.currentSeason = season;
+    // save the settings
+    let settingsPath = path.join(__dirname, 'settings.json').replace("src\\", "");
+    fs.writeFileSync(settingsPath, JSON.stringify(settings));
+    // load the episode
+    window.location.href = "watch.html";
+}
+
+function escapeSingleQuotes(str) {
+    return str.replace(/'/g, "\\'");
 }

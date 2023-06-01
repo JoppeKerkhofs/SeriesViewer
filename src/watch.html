@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="assets/fontawesome/css/regular.css">
     <link rel="stylesheet" href="style.css">
     <script src="./scripts/colorMode.js"></script>
+    <script src="./scripts/watch.js"></script>
 </head>
 <body>
     <nav>
@@ -21,7 +22,15 @@
         </ul>
     </nav>
     <main>
-        <h1>Watch</h1>
+        <h1 id="title">Watch</h1>
+        <div id="videoContainer">
+            <video id="video" controls>
+            </video>
+        </div>
+        <div id="episodeNav">
+            <button id="prevEpisode" type="button" class="episodeButton" onclick="loadPreviousEpisode();"><i class="fas fa-chevron-left"></i> Previous episode</button>
+            <button id="nextEpisode" type="button" class="episodeButton" onclick="loadNextEpisode();">Next episode <i class="fas fa-chevron-right"></i></button>
+        </div>
     </main>
 </body>
 </html>

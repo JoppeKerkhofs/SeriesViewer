@@ -25,7 +25,7 @@ function createWindow() {
                 seriesPath: '/path/to/series',
                 currentEpisode: '',
                 currentSeason: '',
-                currentTimestamp: 0
+                currentTime: 0
             };
             fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2));
         }
@@ -38,6 +38,7 @@ function createWindow() {
     const mainWindow = new BrowserWindow({
         width: 1920,
         height: 1080,
+        icon: path.join(__dirname, 'src/assets/icons/favicon.ico'),
         webPreferences: {
             nodeIntegration: true, // Enable Node.js integration
             contextIsolation: false // Enable IPC communication
@@ -70,9 +71,6 @@ app.on('ready', () => {
         const settingsPath = path.join(__dirname, 'settings.json');
         const settingsData = JSON.stringify(settings, null, 2);
         fs.writeFileSync(settingsPath, settingsData);
-
-        // Log the updated settings data
-        // console.log('Updated settings:', settings);
     });
 
     // Listener to handle opening of directory dialog
@@ -87,11 +85,4 @@ app.on('ready', () => {
             console.error('Error selecting directory:', err);
         });
     });
-});
-
-// Save the settings data to settings.json file before quitting the app
-app.on('before-quit', () => {
-    const settingsPath = path.join(__dirname, 'settings.json');
-    const settingsData = JSON.stringify(settings, null, 2);
-    fs.writeFileSync(settingsPath, settingsData);
 });
