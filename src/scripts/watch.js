@@ -55,7 +55,7 @@ function loadVideo(season, episode, timestamp) {
 
 function loadNextEpisode() {
     // get the settings file 
-    const settings = getSettingsFile();
+    settings = getSettingsFile();
     // Get the current season and episode
     const currentSeason = settings.currentSeason;
     const currentEpisode = settings.currentEpisode;
@@ -106,7 +106,7 @@ function loadNextEpisode() {
 
 function loadPreviousEpisode() {
     // get the settings file
-    const settings = getSettingsFile();
+    settings = getSettingsFile();
     // Get the current season and episode
     const currentSeason = settings.currentSeason;
     const currentEpisode = settings.currentEpisode;
@@ -189,6 +189,8 @@ function getSettingsFile() {
 }
 
 function updateSettingsFile(settings) {
+    // console log the settings
+    console.log(settings);
     // check what os is used
     if (process.platform === "win32") {
         // windows
