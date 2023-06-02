@@ -4,7 +4,6 @@ const fs = require('fs');
 // the video element
 let video;
 let settings;
-const settingsPath = path.join(__dirname, 'settings.json').replace("src\\", "");
 
 document.addEventListener('DOMContentLoaded', () => {
     // get the title element
@@ -13,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     video = document.getElementById("video");
     
     // read the settings file
-    settings = JSON.parse(fs.readFileSync(settingsPath));
+    settings = getSettingsFile();
 
     // set the title
     title.innerHTML = "Watch " + settings.currentEpisode.replace(".mkv", "");
@@ -32,8 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             // save the current time in settings
             settings.currentTime = video.currentTime;
-            // save the settings
-            fs.writeFileSync(settingsPath, JSON.stringify(settings));
+            // update the settings file
+            updateSettingsFile(settings);
         }
     });
 });
@@ -45,18 +44,18 @@ function loadVideo(season, episode, timestamp) {
     video.src = videoPath;
     // load the video
     video.load();
-
     // check if there is a timestamp higher than 1 minute
     if (timestamp > 60) {
         // set the video to start at the timestamp
         video.currentTime = timestamp;
     }
-
     // play the video
     video.play();
 }
 
 function loadNextEpisode() {
+    // get the settings file 
+    const settings = getSettingsFile();
     // Get the current season and episode
     const currentSeason = settings.currentSeason;
     const currentEpisode = settings.currentEpisode;
@@ -85,8 +84,8 @@ function loadNextEpisode() {
                 // Set the current season and episode
                 settings.currentSeason = nextSeason;
                 settings.currentEpisode = nextEpisode;
-                // Save the settings
-                fs.writeFileSync(settingsPath, JSON.stringify(settings));
+                // update the settings file
+                updateSettingsFile(settings);
                 // Set the title
                 title.innerHTML = "Watch " + nextEpisode.replace(".mkv", "");
             }
@@ -98,14 +97,16 @@ function loadNextEpisode() {
         loadVideo(currentSeason, nextEpisode);
         // Set the current episode
         settings.currentEpisode = nextEpisode;
-        // Save the settings
-        fs.writeFileSync(settingsPath, JSON.stringify(settings));
+        // update the settings file
+        updateSettingsFile(settings);
         // Set the title
         title.innerHTML = "Watch " + nextEpisode.replace(".mkv", "");
     }
 }
 
 function loadPreviousEpisode() {
+    // get the settings file
+    const settings = getSettingsFile();
     // Get the current season and episode
     const currentSeason = settings.currentSeason;
     const currentEpisode = settings.currentEpisode;
@@ -134,8 +135,8 @@ function loadPreviousEpisode() {
                 // Set the current season and episode
                 settings.currentSeason = previousSeason;
                 settings.currentEpisode = previousEpisode;
-                // Save the settings
-                fs.writeFileSync(settingsPath, JSON.stringify(settings));
+                // update the settings file
+                updateSettingsFile(settings);
                 // Set the title
                 title.innerHTML = "Watch " + previousEpisode.replace(".mkv", "");
             }
@@ -148,7 +149,7 @@ function loadPreviousEpisode() {
         // Set the current episode
         settings.currentEpisode = previousEpisode;
         // Save the settings
-        fs.writeFileSync(settingsPath, JSON.stringify(settings));
+        updateSettingsFile(settings);
         // Set the title
         title.innerHTML = "Watch " + previousEpisode.replace(".mkv", "");
     }
@@ -174,4 +175,26 @@ function getSeasons(seriesPath) {
         .map((dirent) => dirent.name)
         .sort();
     return seasonFolders;
+}
+
+function getSettingsFile() {
+    // check what os is used
+    if (process.platform === "win32") {
+        // windows
+        return JSON.parse(fs.readFileSync(path.join(__dirname, 'settings.json').replace("src\\", "")));
+    } else {
+        // linux or mac
+        return JSON.parse(fs.readFileSync(path.join(__dirname, 'settings.json').replace("src/", "")));
+    }
+}
+
+function updateSettingsFile(settings) {
+    // check what os is used
+    if (process.platform === "win32") {
+        // windows
+        fs.writeFileSync(path.join(__dirname, 'settings.json').replace("src\\", ""), JSON.stringify(settings));
+    } else {
+        // linux or mac
+        fs.writeFileSync(path.join(__dirname, 'settings.json').replace("src/", ""), JSON.stringify(settings));
+    }
 }

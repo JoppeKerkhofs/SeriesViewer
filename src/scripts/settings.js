@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { get } = require('http');
 const path = require('path');
 
 // settings.js
@@ -27,28 +28,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Listener to handle the selected directory path
     ipcRenderer.on('selectedDirectory', (event, directoryPath) => {
+        // get the settings file
+        const settings = getSettingsFile();
         // check if the directory path is valid
         if (!directoryPath) {
             console.error('Invalid directory path');
             return;
         }
         // Update the settings with the selected directory path
-        ipcRenderer.send('updateSettings', { seriesPath: directoryPath });
+        settings.seriesPath = directoryPath;
         // Update the current directory text
         updateDirectoryText(directoryPath);
         // update the current season and episode to the first of both, with the names of the files
         // get the first season
         const seasons = getSeasons(directoryPath);
         const firstSeason = seasons[0];
+        settings.currentSeason = firstSeason;
         // get the first episode
         const episodes = getEpisodesForSeason(directoryPath, firstSeason);
         const firstEpisode = episodes[0];
+        settings.currentEpisode = firstEpisode;
         // update the settings file
-        ipcRenderer.send('updateSettings', { currentSeason: firstSeason, currentEpisode: firstEpisode });
+        updateSettingsFile(settings);
     });
 
     // read the settings file
-    const settings = JSON.parse(fs.readFileSync(path.join(__dirname, 'settings.json').replace("src\\", "")));
+    const settings = getSettingsFile();
     // Set the initial directory path based on the stored value
     const storedDirectoryPath = settings.seriesPath;
     if (storedDirectoryPath) {
@@ -115,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add change event listener to the select credit skip checkbox
     selectCreditSkip.addEventListener('change', () => {
         // get the settingsfile
-        const settings = JSON.parse(fs.readFileSync(path.join(__dirname, 'settings.json').replace("src\\", "")));
+        const settings = getSettingsFile();
         // check if the checkbox is checked
         if (selectCreditSkip.checked) {
             // show the range input div
@@ -135,18 +140,40 @@ document.addEventListener('DOMContentLoaded', () => {
             settings.skipCreditsTime = 0;
         }
         // write the settings file
-        fs.writeFileSync(path.join(__dirname, 'settings.json').replace("src\\", ""), JSON.stringify(settings));
+        updateSettingsFile(settings);
     });
 
     // Update the displayed value when the range input value changes
     rangeInput.addEventListener("input", () => {
         // get the settingsfile
-        const settings = JSON.parse(fs.readFileSync(path.join(__dirname, 'settings.json').replace("src\\", "")));
+        const settings = getSettingsFile();
         // update the settings
         settings.skipCreditsTime = rangeInput.value;
         // write the settings file
-        fs.writeFileSync(path.join(__dirname, 'settings.json').replace("src\\", ""), JSON.stringify(settings));
+        updateSettingsFile(settings);
         // update the displayed value
         valueDisplay.textContent = rangeInput.value + " seconds";
     });
 });
+
+function getSettingsFile() {
+    // check what os is used
+    if (process.platform === "win32") {
+        // windows
+        return JSON.parse(fs.readFileSync(path.join(__dirname, 'settings.json').replace("src\\", "")));
+    } else {
+        // linux or mac
+        return JSON.parse(fs.readFileSync(path.join(__dirname, 'settings.json').replace("src/", "")));
+    }
+}
+
+function updateSettingsFile(settings) {
+    // check what os is used
+    if (process.platform === "win32") {
+        // windows
+        fs.writeFileSync(path.join(__dirname, 'settings.json').replace("src\\", ""), JSON.stringify(settings));
+    } else {
+        // linux or mac
+        fs.writeFileSync(path.join(__dirname, 'settings.json').replace("src/", ""), JSON.stringify(settings));
+    }
+}

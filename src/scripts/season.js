@@ -14,8 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     episodePicker = document.getElementById('episodePicker');
 
     // Read the series directory path from the settings file
-    let settingsPath = path.join(__dirname, 'settings.json').replace("src\\", "");
-    settings = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
+    settings = getSettingsFile();
 
     // get all the seasons
     const seasons = getSeasons(settings.seriesPath);
@@ -91,12 +90,33 @@ function loadEpisode(season, episode) {
     settings.currentEpisode = episode;
     settings.currentSeason = season;
     // save the settings
-    let settingsPath = path.join(__dirname, 'settings.json').replace("src\\", "");
-    fs.writeFileSync(settingsPath, JSON.stringify(settings));
+    updateSettingsFile(settings);
     // load the episode
     window.location.href = "watch.html";
 }
 
 function escapeSingleQuotes(str) {
     return str.replace(/'/g, "\\'");
+}
+
+function getSettingsFile() {
+    // check what os is used
+    if (process.platform === "win32") {
+        // windows
+        return JSON.parse(fs.readFileSync(path.join(__dirname, 'settings.json').replace("src\\", "")));
+    } else {
+        // linux or mac
+        return JSON.parse(fs.readFileSync(path.join(__dirname, 'settings.json').replace("src/", "")));
+    }
+}
+
+function updateSettingsFile(settings) {
+    // check what os is used
+    if (process.platform === "win32") {
+        // windows
+        fs.writeFileSync(path.join(__dirname, 'settings.json').replace("src\\", ""), JSON.stringify(settings));
+    } else {
+        // linux or mac
+        fs.writeFileSync(path.join(__dirname, 'settings.json').replace("src/", ""), JSON.stringify(settings));
+    }
 }
