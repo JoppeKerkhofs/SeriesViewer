@@ -25,7 +25,8 @@ function createWindow() {
                 seriesPath: '/path/to/series',
                 currentEpisode: '',
                 currentSeason: '',
-                currentTime: 0
+                currentTime: 0,
+                skipCreditsTime: 0,
             };
             fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2));
         }

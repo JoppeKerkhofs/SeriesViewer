@@ -264,6 +264,70 @@ h1 {
     font-weight: bold;
 }
 
+/* CREDIT SKIP */
+
+#creditSkip {
+    margin-top: 20px;
+    display: flex;
+    gap: 30px;
+}
+
+#creditSkip div {
+    display: flex;
+    justify-content: space-between;
+}
+
+#creditSkip div:first-child {
+    flex-wrap: wrap;
+    min-width: 130px;
+}
+
+#creditSkip div:last-child {
+    width: 100%;
+    flex-wrap: nowrap;
+}
+
+#selectCreditSkipTime {
+    width: 90%;
+    margin-top: 7px;
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: var(--onBackground);
+    height: 5px;
+    border-radius: 5px;
+    outline: none;
+}
+
+#selectCreditSkipTime::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    background-color: var(--primary);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+#selectCreditSkipTime::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    background-color: var(--primary);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+#creditSkipTimeDiv > label {
+    min-width: 80px;
+}
+
+#creditSkipTimeText {
+    display: block;
+    margin-top: 3px;
+    text-align: center;
+    font-size: 14px;
+    min-width: 100px;
+}
+
 /* -------------------- WATCH -------------------- */
 
 #videoContainer {

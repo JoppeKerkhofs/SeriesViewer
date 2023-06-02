@@ -23,8 +23,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // check when the video has less than 25 seconds left
     video.addEventListener('timeupdate', () => {
-        // check if the video is less than 25 seconds from the end
-        if (video.duration - video.currentTime < 25) {
+        // get the skiptime from the settings
+        const skipTime = settings.skipCreditsTime;
+        // check if the video is less than the skipTime seconds from the end
+        if (video.duration - video.currentTime <= skipTime) {
             // set the next episode
             loadNextEpisode();
         } else {
