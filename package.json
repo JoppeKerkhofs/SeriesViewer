@@ -5,6 +5,7 @@
   "description": "An app to view your series",
   "main": "main.js",
   "scripts": {
+    "dev": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron-forge start",
     "package": "electron-forge package",
