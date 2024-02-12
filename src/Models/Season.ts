@@ -1,20 +1,19 @@
 // this is the code for the season model
 
-class Season {
+import Episode from './Episode';
+
+export default class Season {
     // the season name
     private _name: string;
     // the season number
     private _number: number;
     // the season episodes
     private _episodes: Episode[];
-    // the season image
-    private _image: string;
 
-    constructor(name?: string, number?: number, episodes?: Episode[], image?: string) {
+    constructor(name?: string, number?: number, episodes?: Episode[]) {
         this._name = name || '';
         this._number = number || 0;
         this._episodes = episodes || [];
-        this._image = image || '';
     }
 
     get name(): string {
@@ -29,10 +28,6 @@ class Season {
         return this._episodes;
     }
 
-    get image(): string {
-        return this._image;
-    }
-
     set name(name: string) {
         this._name = name;
     }
@@ -43,10 +38,6 @@ class Season {
 
     set episodes(episodes: Episode[]) {
         this._episodes = episodes;
-    }
-    
-    set image(image: string) {
-        this._image = image;
     }
 
     // other methods

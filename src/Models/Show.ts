@@ -1,15 +1,17 @@
 // this is the code for the Show model
 
+import Season from './Season';
+
  export default class Show {
     private _name: string;
-    private _rating: number;
+    private _rating: string;
     private _genre: string;
     private _image: string;
     private _seasons: Season[];
 
-    constructor(name?: string, rating?: number, genre?: string, image?: string, seasons?: Season[]) {
+    constructor(name?: string, rating?: string, genre?: string, image?: string, seasons?: Season[]) {
         this._name = name || '';
-        this._rating = rating || 0;
+        this._rating = rating || '0';
         this._genre = genre || '';
         this._image = image || '';
         this._seasons = seasons || [];
@@ -19,7 +21,7 @@
         return this._name;
     }
 
-    get rating(): number {
+    get rating(): string {
         return this._rating;
     }
 
@@ -39,7 +41,7 @@
         this._name = name;
     }
 
-    set rating(rating: number) {
+    set rating(rating: string) {
         this._rating = rating;
     }
 
