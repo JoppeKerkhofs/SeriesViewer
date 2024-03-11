@@ -3,21 +3,14 @@
 import Episode from './Episode';
 
 export default class Season {
-    // the season name
-    private _name: string;
     // the season number
     private _number: number;
     // the season episodes
     private _episodes: Episode[];
 
-    constructor(name?: string, number?: number, episodes?: Episode[]) {
-        this._name = name || '';
+    constructor(number?: number, episodes?: Episode[]) {
         this._number = number || 0;
         this._episodes = episodes || [];
-    }
-
-    get name(): string {
-        return this._name;
     }
 
     get number(): number {
@@ -26,10 +19,6 @@ export default class Season {
 
     get episodes(): Episode[] {
         return this._episodes;
-    }
-
-    set name(name: string) {
-        this._name = name;
     }
 
     set number(number: number) {

@@ -6,10 +6,8 @@ import Show from '../Models/Show';
 import Season from '../Models/Season';
 import Episode from '../Models/Episode';
 // import the apiResponse models
-import { ShowResponse, SeasonResponse, EpisodeResponse } from '../Models/apiResponseModels/seasonResponseModel';
-
-// import the api calls
-import { searchShow, searchSeason, searchEpisode } from '../api/omdbCalls';
+import { ShowResponse, SeasonResponse, EpisodeResponse } from '../Models/apiResponseModels';
+import { ipcRenderer } from 'electron';
 
 // function to initialize a new show
 export function initializeShow(name: string){
@@ -22,34 +20,28 @@ export function initializeShow(name: string){
     let seasons: Season[] = [];
     let episodes: Episode[] = [];
 
-    // get the data from the api
-    searchShow(name).then((data: ShowResponse) => {
-        // create a new show
+    // get the show data from the api using the ipcRenderer function, the show data will be returned
+    ipcRenderer.send('get-show', name);
+
+    ipcRenderer.on('get-show', (event, data: ShowResponse) => {
         show = new Show(data.Title, data.imdbRating, data.Genre, data.Poster);
 
-        // get the seasons
+        // for every season, get the season data from the api using the ipcRenderer function, the season data will be returned
         for(let i = 1; i <= parseInt(data.totalSeasons); i++){
-            searchSeason(name, i).then((seasonData: SeasonResponse) => {
-                // create a new season
-                let season = new Season(seasonData.Title, parseInt(seasonData.Season), []);
-
-                // get the episodes
-                for(let j = 0; j < seasonData.Episodes.length; j++){
-                    searchEpisode(name, parseInt(seasonData.Season), j + 1).then((episodeData: EpisodeResponse) => {
-                        // parse the runtime to a number, the format is '30 min'
-                        let runtime = parseInt(episodeData.Runtime.split(' ')[0]);
-                        // create a new episode
-                        let episode = new Episode(parseInt(seasonData.Season), episodeData.Title, runtime, episodeData.Poster, false, false);
-                        episodes.push(episode);
-                        season.episodes = episodes;
+            ipcRenderer.send('get-season', name, i);
+            ipcRenderer.on('get-season', (event, data: SeasonResponse) => {
+                let season = new Season(parseInt(data.Season));
+                // for every episode, get the episode data from the api using the ipcRenderer function, the episode data will be returned
+                for(let j = 1; j <= data.Episodes.length; j++){
+                    ipcRenderer.send('get-episode', name, i, j);
+                    ipcRenderer.on('get-episode', (event, data: EpisodeResponse) => {
+                        episodes.push(new Episode(i, data.Title, parseInt(data.Runtime), data.Poster));
                     });
                 }
-                seasons.push(season);
-                show.seasons = seasons;
+                // save the season
+                show.addSeason(season);
             });
         }
-
-        // store the show in the localstorage
-        localStorage.setItem(name, JSON.stringify(show));
     });
+
 }
