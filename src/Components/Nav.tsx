@@ -14,7 +14,7 @@ function Nav() {
     };
 
   return (
-    <div>
+    <div className='bg-slate-50 h-[100vh]'>
         <nav className="bg-background text-onBackground p-4">
         <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between">

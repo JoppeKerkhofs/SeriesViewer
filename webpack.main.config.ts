@@ -15,6 +15,13 @@ export const mainConfig: Configuration = {
   },
   plugins,
   resolve: {
-    extensions: ['.js', '.ts', '.jsx', '.tsx', '.css', '.json'],
+    fallback: {
+      fs: false,
+      path: false,
+    },
+    extensions: ['.js', '.ts', '.jsx', '.tsx', '.css'],
   },
+  externals: {
+    electron: 'commonjs electron',
+  }
 };
