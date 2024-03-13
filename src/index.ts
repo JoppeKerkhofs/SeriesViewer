@@ -32,6 +32,7 @@ const createWindow = (): void => {
 
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+  mainWindow.setBackgroundColor('#f8fafc');
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
@@ -61,32 +62,32 @@ const createWindow = (): void => {
     });
   });
 
-  ipcMain.on('load-local-file', (event, location) => {
+  ipcMain.on('load-local-file', (event, { location, requestId }) => {
     // get the file
     const filePath = location;
     // if the file is an image file, read it as a data url
     if (filePath.endsWith('.jpg') || filePath.endsWith('.png')) {
-      fs.readFile(filePath, (err, data) => {
-        if (err) {
-          console.error('Error reading file:', err);
-          event.reply('load-local-file', 'error');
-        } else {
-          const dataUrl = `data:image/${path.extname(filePath).slice(1)};base64,${data.toString('base64')}`;
-          event.reply('load-local-file', dataUrl);
-        }
-      });
+        fs.readFile(filePath, (err, data) => {
+            if (err) {
+                console.error('Error reading file:', err);
+                event.reply(`load-local-file-${requestId}`, 'error');
+            } else {
+                const dataUrl = `data:image/${path.extname(filePath).slice(1)};base64,${data.toString('base64')}`;
+                event.reply(`load-local-file-${requestId}`, dataUrl);
+            }
+        });
     } else {
-      // if the file is not an image file, read it as a text file
-      fs.readFile(filePath, 'utf8', (err, data) => {
-        if (err) {
-          console.error('Error reading file:', err);
-          event.reply('load-local-file', 'error');
-        } else {
-          event.reply('load-local-file', data);
-        }
-      });
+        // if the file is not an image file, read it as a text file
+        fs.readFile(filePath, 'utf8', (err, data) => {
+            if (err) {
+                console.error('Error reading file:', err);
+                event.reply(`load-local-file-${requestId}`, 'error');
+            } else {
+                event.reply(`load-local-file-${requestId}`, data);
+            }
+        });
     }
-  });
+  }); 
 };
 
 app.on('ready', () => {

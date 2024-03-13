@@ -1,65 +1,46 @@
 // this will be the homepage of the application, it will contain the list of all the shows and a search bar to search for shows.
+import { useState } from 'react';
+import AddIcon from '@mui/icons-material/Add';
 
 // import needed components
 import Show from '../Models/Show';
 import ShowItem from './homepage/ShowItem';
+import AddShow from './homepage/AddShow';
+import ShowDetails from './homepage/ShowDetails';
 
-// import needed scripts
-import { initializeShow } from '../scripts/addShow';
-import { useState } from 'react';
-
-function Home() {
+export default function Home() {
   // get the list of shows from the local storage
   const shows = localStorage.getItem('shows');
-  const [loading, setLoading] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false); // State to control the visibility of the AddShow modal
+  const [selectedShow, setSelectedShow] = useState<Show | null>(null); // State to store the selected show to display its details
 
-  function addShow() {
-    // this function will show a modal to add a show, the user needs to input the name of the show
-
-    // create a modal
-    const modal = document.createElement('div');
-    modal.classList.add('fixed', 'top-0', 'left-0', 'w-full', 'h-full', 'bg-background', 'bg-opacity-70', 'flex', 'justify-center', 'items-center');
-
-    // create a form
-    const form = document.createElement('form');
-    form.classList.add('bg-white', 'p-4', 'rounded-xl', 'flex', 'flex-col', 'items-center', 'justify-center');
-
-    // create a label
-    const label = document.createElement('label');
-    label.classList.add('text-black', 'font-medium', 'mb-3');
-    label.textContent = 'Enter the name of the show:';
-    form.appendChild(label);
-
-    // create an input
-    const input = document.createElement('input');
-    input.classList.add('rounded-xl', 'p-2', 'mb-3', 'bg-gray-200');
-    form.appendChild(input);
-
-    // create a button
-    const button = document.createElement('button');
-    button.classList.add('rounded-[16px]', 'bg-primary-1', 'p-4', 'text-onPrimary-1', 'font-medium', 'hover:bg-primary-2', 'hover:text-onPrimary-2', 'duration-300');
-    button.textContent = 'Add Show';
-    button.addEventListener('click', () => {
-      // set loading to true
-      setLoading(true);
-      initializeShow(input.value).then(() => setLoading(false));
-      modal.remove();
-    });
-
-    // also remove the modal if the user clicks outside of it, but not if the user clicks inside the modal
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.remove();
-      }
-    });
-
-    form.appendChild(button);
-    modal.appendChild(form);
-    document.body.appendChild(modal);
+  function toggleAddModal() {
+    console.log('toggling add modal');
+    // toggle the visibility of the AddShow modal
+    setShowAddModal(!showAddModal);
   }
 
-  function clearShows() {
-    localStorage.removeItem('shows');
+  function removeShow(id: string) {
+    // remove the show from the local storage
+    const showsParsed = JSON.parse(shows || '[]');
+    const newShows = showsParsed.filter((show: Show) => show.id !== id);
+    localStorage.setItem('shows', JSON.stringify(newShows));
+    // remove the assets of the show
+    const show = showsParsed.find((show: Show) => show.id === id);
+    if (show !== undefined) {
+      let location = show
+        .name
+        .toLowerCase()
+        .replace(/\s/g, '');
+      const fs = window.require('fs');
+      // set the parent folder of the show, src/assets/location
+      location = 'src/assets/' + location;
+      // first, check if the folder of the show exists
+      if (fs.existsSync(location)) {
+        // remove the folder of the show
+        fs.rmdirSync(location, { recursive: true });
+      }
+    }
     // reload the page
     window.location.reload();
   }
@@ -68,9 +49,9 @@ function Home() {
   function checkShows() {
     if (shows === null) {
       return (
-        <div className="text-center mt-20">
+        <div className="text-center my-20">
           <h2 className="text-xl mb-3">No shows found</h2>
-          <button onClick={addShow} className="rounded-[16px] bg-primary-1 p-4 text-onPrimary-1 font-medium hover:bg-primary-2 hover:text-onPrimary-2 duration-300">Add your first show</button>
+          <button onClick={toggleAddModal} className="rounded-[16px] bg-primary-1 p-4 text-onPrimary-1 font-medium hover:bg-primary-2 hover:text-onPrimary-2 duration-300">Add your first show</button>
         </div>
       );
     } else {
@@ -78,11 +59,11 @@ function Home() {
       const showsParsed = JSON.parse(shows);
       // if there are shows in the local storage, return the list of shows
       let showItems = showsParsed.map((show: Show) => (
-        <ShowItem key={show.id} show={show} />
+        <ShowItem key={show.id} show={show} removeShow={removeShow} onClick={setSelectedShow} />
       ));
 
       return (
-        <div className='h-full'>
+        <div className='h-full pb-10'>
           <div className="flex flex-wrap gap-4 mt-4">
             {showItems}
           </div>
@@ -93,25 +74,19 @@ function Home() {
 
   return (
     <>
-      <div className='flex justify-between'>
-        <h1 className="text-2xl font-bold">Your Shows:</h1>
-        <div>
-          <button onClick={addShow} className="rounded-[16px] bg-red-500 p-4 text-onPrimary-1 font-medium hover:bg-red-700 hover:text-onPrimary-2 duration-300">Add Show</button>
-          <button onClick={clearShows} className="rounded-[16px] bg-red-500 p-4 text-onPrimary-1 font-medium hover:bg-red-700 hover:text-onPrimary-2 duration-300 ml-4">Clear Shows</button>
-        </div>
-      </div>
-      {loading ? (
-        <div className="w-full h-full fixed top-0 left-0 bg-background bg-opacity-70 flex justify-center items-center">
-          <div className="bg-white p-4 rounded-xl flex flex-col items-center justify-center">
-            <h2 className="text-black font-medium mb-3">Adding your new show.</h2>
-            <h2 className="text-black font-medium mb-3">Please wait ...</h2>
+      {selectedShow ? <ShowDetails id={selectedShow.id} setSelectedShow={setSelectedShow} /> : (
+        <>
+          <div className='flex justify-between'>
+            <h1 className="text-2xl font-bold">Your Shows:</h1>
+            <div>
+              <button onClick={toggleAddModal} className="rounded-[16px] bg-transparent border-primary-1 border-2 p-2 text-onPrimary-1 font-medium hover:bg-primary-2 hover:border-primary-2 hover:text-onPrimary-2 duration-300"><AddIcon fontSize='large' /></button>
+            </div>
           </div>
-        </div>
-      ) : (
           <>{checkShows()}</>
+          {/* Render AddShow modal based on showAddModal state */}
+          {showAddModal && <AddShow toggleModal={toggleAddModal} />}
+        </>
       )}
     </>
   );
 };
-
-export default Home;

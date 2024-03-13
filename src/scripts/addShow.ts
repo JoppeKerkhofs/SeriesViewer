@@ -30,8 +30,7 @@ export async function initializeShow(name: string){
     });
 
     // download the poster of the show
-    console.log('fetching poster');
-    let location = showData.Title.toLowerCase().replace( /\s/g, '') + '/posters';
+    let location = showData.Title.toLowerCase().replace(/\s/g, '').replace(/[^\w\s]/gi, '') + '/posters';
     // get the poster via the getPoster function
     const poster: string = await new Promise((resolve) => {
         ipcRenderer.send('get-online-image', showData.Poster, location);
@@ -39,8 +38,6 @@ export async function initializeShow(name: string){
             resolve(data);
         });
     });
-
-    console.log("Poster: ", poster);
 
     const show = new Show(showData.Title, showData.imdbRating, showData.Genre, poster);
 
@@ -67,7 +64,7 @@ export async function initializeShow(name: string){
                         });
                     });
                     console.log("Getting episode poster");
-                    let location = show.name.toLowerCase().replace( /\s/g, '') + '/episodes';
+                    let location = showData.Title.toLowerCase().replace(/\s/g, '').replace(/[^\w\s]/gi, '') + '/episodes';
                     // get the poster of the episode
                     const episodePoster: string = await new Promise((resolve) => {
                         ipcRenderer.send('get-online-image', episodeData.Poster, location);

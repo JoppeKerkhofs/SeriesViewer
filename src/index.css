@@ -9,3 +9,7 @@
   max-width: 38rem;
   padding: 2rem;
 } */
+
+html, body, #root {
+  height: 100%;
+}
