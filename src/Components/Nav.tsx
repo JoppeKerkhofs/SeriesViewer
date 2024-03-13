@@ -23,9 +23,9 @@ function Nav() {
                 </div>
                 <div className="hidden md:block">
                     <div className="ml-4 flex items-center space-x-4">
-                    <button onClick={() => handlePageChange('home')} className={`text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium ${activePage === 'home' ? 'bg-primary-1 text-onPrimary-1' : ''}`}>Home</button>
-                    <button onClick={() => handlePageChange('watch')} className={`text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium ${activePage === 'watch' ? 'bg-primary-1 text-onPrimary-1' : ''}`}>Watch</button>
-                    <button onClick={() => handlePageChange('settings')} className={`text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium ${activePage === 'settings' ? 'bg-primary-1 text-onPrimary-1' : ''}`}>Settings</button>
+                    <button onClick={() => handlePageChange('home')} className={`text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium duration-150 ${activePage === 'home' ? 'bg-primary-1 text-onPrimary-1' : ''}`}>Home</button>
+                    <button onClick={() => handlePageChange('watch')} className={`text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium duration-150 ${activePage === 'watch' ? 'bg-primary-1 text-onPrimary-1' : ''}`}>Watch</button>
+                    <button onClick={() => handlePageChange('settings')} className={`text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium duration-150 ${activePage === 'settings' ? 'bg-primary-1 text-onPrimary-1' : ''}`}>Settings</button>
                     </div>
                 </div>
             </div>

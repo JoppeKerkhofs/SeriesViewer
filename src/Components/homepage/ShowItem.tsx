@@ -35,7 +35,7 @@ export default function ShowItem(props: ShowItemProps) {
         <div onClick={() => onClick(show)} className='bg-white drop-shadow-lg rounded-lg p-3 hover:drop-shadow-2xl duration-150 cursor-pointer text-2xl w-[330px] h-[450px] flex flex-col justify-center'>
             <div className='flex items-center mb-2'>
                 <h2 className='text-center font-semibold truncate select-none'>{show.name}</h2>
-                <button className='ml-auto text-red-500 hover:text-red-700 duration-150 p-2' onClick={() => setShowConfirmation(true)} title='Remove this show'>
+                <button className='ml-auto text-red-500 hover:text-red-700 duration-150 p-2' onClick={(e) => {e.stopPropagation(); setShowConfirmation(true);}} title='Remove this show'>
                     <DeleteIcon />
                 </button>
             </div>

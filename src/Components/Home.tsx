@@ -2,17 +2,24 @@
 import { useState } from 'react';
 import AddIcon from '@mui/icons-material/Add';
 
-// import needed components
+// import needed models
 import Show from '../Models/Show';
+import Season from '../Models/Season';
+import Episode from '../Models/Episode';
+
+// import needed components
 import ShowItem from './homepage/ShowItem';
 import AddShow from './homepage/AddShow';
 import ShowDetails from './homepage/ShowDetails';
+import SeasonDetails from './homepage/details/SeasonDetails';
 
 export default function Home() {
   // get the list of shows from the local storage
   const shows = localStorage.getItem('shows');
-  const [showAddModal, setShowAddModal] = useState(false); // State to control the visibility of the AddShow modal
-  const [selectedShow, setSelectedShow] = useState<Show | null>(null); // State to store the selected show to display its details
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedShow, setSelectedShow] = useState<Show | null>(null);
+  const [selectedSeason, setSelectedSeason] = useState<Season | null>(null);
+  const [selectedEpisode, setSelectedEpisode] = useState<Episode | null>(null);
 
   function toggleAddModal() {
     console.log('toggling add modal');
@@ -74,7 +81,13 @@ export default function Home() {
 
   return (
     <>
-      {selectedShow ? <ShowDetails id={selectedShow.id} setSelectedShow={setSelectedShow} /> : (
+      {selectedShow ? (
+        selectedSeason ? (
+            <SeasonDetails showId={selectedShow.id} season={selectedSeason} setSelectedSeason={setSelectedSeason} setSelectedEpisode={setSelectedEpisode} />
+          ) : (
+            <ShowDetails id={selectedShow.id} setSelectedShow={setSelectedShow} setSelectedSeason={setSelectedSeason} />
+          )
+        ) : (
         <>
           <div className='flex justify-between'>
             <h1 className="text-2xl font-bold">Your Shows:</h1>

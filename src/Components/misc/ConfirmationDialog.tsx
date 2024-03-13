@@ -14,10 +14,10 @@ export default function ConfirmationDialog(props: ConfirmationDialogProps) {
             <div className="bg-white p-4 rounded-lg mx-2">
                 <p>{message}</p>
                 <div className="mt-4 flex justify-end">
-                    <button className="mr-2 bg-red-500 text-white px-4 py-2 rounded-lg" onClick={onConfirm}>
+                    <button className="mr-2 bg-red-500 text-white px-4 py-2 rounded-lg" onClick={(e) => {e.stopPropagation(); onConfirm();}}>
                         Confirm
                     </button>
-                    <button className="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg" onClick={onCancel}>
+                    <button className="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg" onClick={(e) => {e.stopPropagation(); onCancel();}}>
                         Cancel
                     </button>
                 </div>

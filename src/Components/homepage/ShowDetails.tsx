@@ -11,10 +11,11 @@ import SeasonItem from './details/SeasonItem';
 interface ShowDetailsProps {
     id: string;
     setSelectedShow: (show: Show | null) => void;
+    setSelectedSeason: (season: Season | null) => void;
 }
 
 export default function ShowDetails(props: ShowDetailsProps) {
-    const { id, setSelectedShow } = props;
+    const { id, setSelectedShow, setSelectedSeason } = props;
 
     // get the show from the local storage
     const shows = JSON.parse(localStorage.getItem('shows') || '[]');
@@ -42,7 +43,7 @@ export default function ShowDetails(props: ShowDetailsProps) {
                 <h1 className='text-2xl text-center font-medium mb-4'>Watch Now</h1>
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
                     {show.seasons.map((season: Season) => (
-                        <SeasonItem key={season.number} showId={id} season={season} />
+                        <SeasonItem key={season.number} showId={id} season={season} setSelectedSeason={setSelectedSeason} />
                     ))}
                 </div>
             </div>

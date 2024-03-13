@@ -3,6 +3,7 @@
 export default class Episode {
     // the season id
     season: number;
+    id: string;
     // the episode name
     name: string;
     // the episode length
@@ -15,6 +16,7 @@ export default class Episode {
     currentlyWatching: boolean;
 
     constructor(season?: number, name?: string, length?: number, image?: string, watched?: boolean, currentlyWatching?: boolean) {
+        this.id = Math.random().toString(36).substr(2, 9);
         this.season = season || 0;
         this.name = name || '';
         this.length = length || 0;
