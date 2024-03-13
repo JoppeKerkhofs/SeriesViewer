@@ -19,15 +19,21 @@ export async function initializeShow(name: string){
         }
     }
 
-    console.log('initializing show: ', name);
-
     // get the show data from the api using the ipcRenderer function, the show data will be returned
-    const showData: ShowResponse = await new Promise((resolve) => {
+    const showData: ShowResponse = await new Promise((resolve, reject) => {
         ipcRenderer.send('get-show', name);
-        ipcRenderer.once('get-show', (event, data: ShowResponse) => {
-            resolve(data);
+        ipcRenderer.once('get-show', (event, data: ShowResponse | string) => {
+            // check if the response is a string, if so, return an error
+            if (typeof data === 'string') {
+                // Throw an error and reject the promise
+                reject(new Error(data));
+            } else {
+                resolve(data);
+            }
         });
     });
+
+    console.log('initializing show: ', name);
 
     // download the poster of the show
     let location = showData.Title.toLowerCase().replace(/\s/g, '').replace(/[^\w\s]/gi, '') + '/posters';
@@ -73,7 +79,11 @@ export async function initializeShow(name: string){
                         });
                     });
                     // add the episode to the season
-                    season.episodes.push(new Episode(i, episodeData.Title, parseInt(episodeData.Runtime), episodePoster));
+                    season.episodes.push(new Episode(show.id, i, episodeData.Title, parseInt(episodeData.Runtime), episodePoster));
+                    // if this is the first episode of the first season, set it as the selected episode
+                    if(i === 1 && j === 1){
+                        show.currentlyWatchingEpisode = season.episodes[0];
+                    }
                 } catch (error) {
                     console.error('Error fetching episode:', error);
                 }

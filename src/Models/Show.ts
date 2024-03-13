@@ -1,4 +1,5 @@
 // this is the code for the Show model
+import Episode from './Episode';
 import Season from './Season';
 
  export default class Show {
@@ -8,6 +9,8 @@ import Season from './Season';
     genre: string;
     image: string;
     seasons: Season[];
+    currentlyWatchingEpisode: Episode;
+    finalized: boolean;
 
     constructor(name?: string, rating?: string, genre?: string, image?: string, seasons?: Season[]) {
         this.id = Math.random().toString(36).substr(2, 9);
@@ -16,12 +19,8 @@ import Season from './Season';
         this.genre = genre || '';
         this.image = image || '';
         this.seasons = seasons || [];
-    }
-
-    // other methods
-
-    public getId(): string {
-        return this.id;
+        this.currentlyWatchingEpisode = null;
+        this.finalized = false;
     }
 
     // add a season to the show

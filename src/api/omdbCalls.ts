@@ -4,12 +4,34 @@ import axios from 'axios';
 
 const API_KEY = '4552d2df';
 
-export async function searchShow(showName: string) {
+export async function searchMovies(movieName: string) {
     try {
-        const response = await axios.get(`https://www.omdbapi.com/?t=${showName}&apikey=${API_KEY}`);
+        const response = await axios.get(`https://www.omdbapi.com/?s=${movieName}&apikey=${API_KEY}&type=movie`);
         // check if the response is valid, if not return an error
         if (response.data.Response === 'False') {
             return response.data.Error;
+        }
+        // check if the response is a movie, if not return an error
+        if (response.data.Type !== 'movie') {
+            return 'This is not a movie';
+        }
+        return response.data.Search;
+    } catch (error) {
+        console.error('Error searching movies:', error);
+        return null; // or any other value indicating failure
+    }
+}
+
+export async function searchShow(showName: string) {
+    try {
+        const response = await axios.get(`https://www.omdbapi.com/?t=${showName}&apikey=${API_KEY}&type=series`);
+        // check if the response is valid, if not return an error
+        if (response.data.Response === 'False') {
+            return response.data.Error;
+        }
+        // check if the response is a series, if not return an error
+        if (response.data.Type !== 'series') {
+            return 'This is not a series';
         }
         return response.data;
     } catch (error) {

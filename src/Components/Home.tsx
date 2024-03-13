@@ -12,14 +12,20 @@ import ShowItem from './homepage/ShowItem';
 import AddShow from './homepage/AddShow';
 import ShowDetails from './homepage/ShowDetails';
 import SeasonDetails from './homepage/details/SeasonDetails';
+import WatchEpisode from './watch/WatchEpisode';
 
-export default function Home() {
+interface HomeProps {
+  handlePageChange: (page: string, selectedShow: Show | null) => void;
+}
+
+export default function Home(props: HomeProps) {
+  // the props of Home
+  const { handlePageChange } = props;
   // get the list of shows from the local storage
   const shows = localStorage.getItem('shows');
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedShow, setSelectedShow] = useState<Show | null>(null);
   const [selectedSeason, setSelectedSeason] = useState<Season | null>(null);
-  const [selectedEpisode, setSelectedEpisode] = useState<Episode | null>(null);
 
   function toggleAddModal() {
     console.log('toggling add modal');
@@ -45,7 +51,7 @@ export default function Home() {
       // first, check if the folder of the show exists
       if (fs.existsSync(location)) {
         // remove the folder of the show
-        fs.rmdirSync(location, { recursive: true });
+        fs.rmSync(location, { recursive: true });
       }
     }
     // reload the page
@@ -54,7 +60,7 @@ export default function Home() {
 
   // check if there are any shows in the local storage, if not, return a message and a button to add a show
   function checkShows() {
-    if (shows === null) {
+    if (shows === null || shows === undefined || shows === '[]') {
       return (
         <div className="text-center my-20">
           <h2 className="text-xl mb-3">No shows found</h2>
@@ -79,11 +85,23 @@ export default function Home() {
     }
   }
 
+  function handleEpisodeSelect(episode: Episode) {
+    // update the show with the selected episode
+    const showsParsed = JSON.parse(shows || '[]');
+    const show = showsParsed.find((show: Show) => show.id === selectedShow.id);
+    if (show) {
+      show.currentlyWatchingEpisode = episode;
+      localStorage.setItem('shows', JSON.stringify(showsParsed));
+    }
+    // change the page to the watch page
+    handlePageChange('watch', selectedShow);
+  }
+
   return (
     <>
       {selectedShow ? (
         selectedSeason ? (
-            <SeasonDetails showId={selectedShow.id} season={selectedSeason} setSelectedSeason={setSelectedSeason} setSelectedEpisode={setSelectedEpisode} />
+            <SeasonDetails showId={selectedShow.id} season={selectedSeason} setSelectedSeason={setSelectedSeason} setSelectedEpisode={handleEpisodeSelect} />
           ) : (
             <ShowDetails id={selectedShow.id} setSelectedShow={setSelectedShow} setSelectedSeason={setSelectedSeason} />
           )

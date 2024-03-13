@@ -3,7 +3,7 @@ import LoopIcon from '@mui/icons-material/Loop';
 export default function Loading() {
     return (
         <div className="w-full h-full fixed top-0 left-0 bg-background bg-opacity-70 flex justify-center items-center">
-            <div className="bg-white p-4 rounded-xl flex flex-col items-center justify-center">
+            <div className="w-[240px] h-[180px] bg-white p-4 rounded-xl flex flex-col items-center justify-evenly">
                 <h2 className="text-black font-medium mb-3">Adding your new show.</h2>
                 <h2 className="text-black font-medium mb-3"><LoopIcon fontSize='large' sx={{ 
                     animation: "spin 2s linear infinite",

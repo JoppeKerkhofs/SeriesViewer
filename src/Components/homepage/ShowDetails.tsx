@@ -1,4 +1,5 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useEffect, useState } from 'react';
 
 // import needed models
 import Show from '../../Models/Show';
@@ -7,6 +8,10 @@ import Season from '../../Models/Season';
 // import needed components
 import CustomImage from '../misc/CustomImage';
 import SeasonItem from './details/SeasonItem';
+import SelectFiles from '../misc/SelectFiles';
+
+// import scripts
+import { updateEpisodesWithVideoFiles } from '../../scripts/addVideoFiles';
 
 interface ShowDetailsProps {
     id: string;
@@ -16,10 +21,15 @@ interface ShowDetailsProps {
 
 export default function ShowDetails(props: ShowDetailsProps) {
     const { id, setSelectedShow, setSelectedSeason } = props;
+    const [baseDirName, setBaseDirName] = useState<string>('');
 
     // get the show from the local storage
     const shows = JSON.parse(localStorage.getItem('shows') || '[]');
     const show = shows.find((show: Show) => show.id === id);
+
+    function getVideoFiles() {
+        updateEpisodesWithVideoFiles(show, baseDirName);
+    }
 
     return (
         <>
@@ -39,14 +49,25 @@ export default function ShowDetails(props: ShowDetailsProps) {
                     <CustomImage src={show.image} alt="show poster" className='rounded-lg h-full max-w-none mx-auto' />
                 </div>
             </div>
-            <div className='max-w-[1000px] mx-auto'>
-                <h1 className='text-2xl text-center font-medium mb-4'>Watch Now</h1>
-                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-                    {show.seasons.map((season: Season) => (
-                        <SeasonItem key={season.number} showId={id} season={season} setSelectedSeason={setSelectedSeason} />
-                    ))}
+            {!show.finalized ? (
+                <>
+                    <div className='max-w-[1000px] mx-auto flex flex-col items-center'>
+                        <h1 className='text-2xl text-center font-medium mb-4 text-red-500'>This show doesn't have valid video files</h1>
+                        <div>
+                            <SelectFiles setBaseDirName={setBaseDirName} getVideoFiles={getVideoFiles}  />
+                        </div>
+                    </div>
+                </>
+            ) : (
+                <div className='max-w-[1000px] mx-auto'>
+                    <h1 className='text-2xl text-center font-medium mb-4'>Watch Now</h1>
+                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+                        {show.seasons.map((season: Season) => (
+                            <SeasonItem key={season.number} showId={id} season={season} setSelectedSeason={setSelectedSeason} />
+                        ))}
+                    </div>
                 </div>
-            </div>
+            )}
         </>
     );
 }

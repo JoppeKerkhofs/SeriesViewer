@@ -23,6 +23,7 @@ const createWindow = (): void => {
   const mainWindow = new BrowserWindow({
     width: 2000,
     height: 1000,
+    autoHideMenuBar: true,
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       nodeIntegration: true,
@@ -39,6 +40,11 @@ const createWindow = (): void => {
 
   ipcMain.on('get-show', (event, name) => {
     searchShow(name).then((data) => {
+      // check if the response is 'This is not a series'
+      if (data === 'This is not a series') {
+        event.reply('get-show', 'This is not a series');
+        return;
+      }
       event.reply('get-show', data);
     });
   });
