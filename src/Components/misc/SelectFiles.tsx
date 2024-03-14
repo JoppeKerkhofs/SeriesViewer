@@ -1,7 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 
+// get the videoFile interface
+import { VideoFile } from '../../Models/videoFile';
+
 interface SelectFilesProps {
-    getVideoFiles: (files: FileList) => void;
+    getVideoFiles: (files: Array<VideoFile>) => void;
 }
 
 export default function SelectFiles(props: SelectFilesProps) {
@@ -22,13 +25,40 @@ export default function SelectFiles(props: SelectFilesProps) {
         }
     };
 
-    const handleFilesSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFilesSelected = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
+        let fileArray: VideoFile[] = [];
         if (files) {
-            console.log(files);
-            getVideoFiles(files);
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const duration = await getVideoMetadata(file);
+                fileArray.push({
+                    name: file.name,
+                    path: file.path,
+                    size: file.size,
+                    type: file.type,
+                    webKitRelativePath: file.webkitRelativePath,
+                    duration: duration
+                });
+            }
+            getVideoFiles(fileArray);
         }
     };
+
+    const getVideoMetadata = async (file: File): Promise<number> => {
+        return new Promise((resolve, reject) => {
+            const video = document.createElement('video');
+            video.preload = 'metadata';
+            video.onloadedmetadata = () => {
+                resolve(video.duration);
+            };
+            video.onerror = (error) => {
+                reject(error);
+            };
+            video.src = "media-loader://" + file.path;
+        });
+    };
+
 
     return (
         <>

@@ -4,6 +4,7 @@ import { useState } from "react";
 // import needed models
 import Show from "../../Models/Show";
 import Season from "../../Models/Season";
+import { VideoFile } from "../../Models/videoFile";
 
 // import needed components
 import CustomImage from "../misc/CustomImage";
@@ -27,7 +28,7 @@ export default function ShowDetails(props: ShowDetailsProps) {
 	const shows = JSON.parse(localStorage.getItem("shows") || "[]");
 	const show = shows.find((show: Show) => show.id === id);
 
-	function getVideoFiles(files: FileList) {
+	function getVideoFiles(files: Array<VideoFile>) {
 		// add the video files to the episodes
 		const updatedShow = updateEpisodesWithVideoFiles(show, files);
 		if (typeof updatedShow === "string") {

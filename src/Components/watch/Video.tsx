@@ -20,9 +20,7 @@ export default function Video(props: VideoProps) {
 	const [videoURL, setVideoURL] = useState<string>(
 		"media-loader://" + episode.path
 	);
-	const [audioURL, setAudioURL] = useState<string>("path_to_audio.mp3"); // Adjust the audio URL
 	const playerRef = useRef<HTMLVideoElement | null>(null);
-	const audioRef = useRef<HTMLAudioElement | null>(null);
 
 	// Function to handle progress updates
 	const handleProgress = (event: Event) => {
@@ -77,7 +75,7 @@ export default function Video(props: VideoProps) {
 		const height = window.innerHeight - 172;
 		const width = height * (16 / 9);
 
-		if (playerRef.current && audioRef.current) {
+		if (playerRef.current) {
 			const player = videojs(playerRef.current, {
 				controls: true,
 				autoplay: true,
@@ -91,19 +89,15 @@ export default function Video(props: VideoProps) {
 			player.on("ended", handleEnded);
 			player.on("ready", onReady);
 
-			// Set up audio player
-			audioRef.current.src = audioURL;
-
 			return () => {
 				player.dispose();
 			};
 		}
-	}, [videoURL, audioURL]); // Make sure to include videoURL and audioURL in the dependency array
+	}, [videoURL]);
 
 	return (
 		<div className='mt-3 flex justify-center'>
 			<video ref={playerRef} className='video-js vjs-big-play-centered' />
-			<audio ref={audioRef} />
 		</div>
 	);
 }
