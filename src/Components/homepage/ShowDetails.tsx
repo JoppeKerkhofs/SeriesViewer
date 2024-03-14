@@ -1,81 +1,115 @@
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useEffect, useState } from 'react';
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useState } from "react";
 
 // import needed models
-import Show from '../../Models/Show';
-import Season from '../../Models/Season';
+import Show from "../../Models/Show";
+import Season from "../../Models/Season";
 
 // import needed components
-import CustomImage from '../misc/CustomImage';
-import SeasonItem from './details/SeasonItem';
-import SelectFiles from '../misc/SelectFiles';
+import CustomImage from "../misc/CustomImage";
+import SeasonItem from "./details/SeasonItem";
+import SelectFiles from "../misc/SelectFiles";
 
 // import scripts
-import { updateEpisodesWithVideoFiles } from '../../scripts/addVideoFiles';
+import { updateEpisodesWithVideoFiles } from "../../scripts/addVideoFiles";
 
 interface ShowDetailsProps {
-    id: string;
-    setSelectedShow: (show: Show | null) => void;
-    setSelectedSeason: (season: Season | null) => void;
+	id: string;
+	setSelectedShow: (show: Show | null) => void;
+	setSelectedSeason: (season: Season | null) => void;
 }
 
 export default function ShowDetails(props: ShowDetailsProps) {
-    const { id, setSelectedShow, setSelectedSeason } = props;
-    const [baseDirName, setBaseDirName] = useState<string>('');
+	const { id, setSelectedShow, setSelectedSeason } = props;
+	const [baseDirName, setBaseDirName] = useState<string>("");
 
-    // get the show from the local storage
-    const shows = JSON.parse(localStorage.getItem('shows') || '[]');
-    const show = shows.find((show: Show) => show.id === id);
+	// get the show from the local storage
+	const shows = JSON.parse(localStorage.getItem("shows") || "[]");
+	const show = shows.find((show: Show) => show.id === id);
 
-    function getVideoFiles(path: string) {
-        console.log('Getting video files');
-        console.log(path);
-        setBaseDirName(path);
-        let updatedShow = updateEpisodesWithVideoFiles(show, path);
-        // update the show in the local storage
-        let updatedShows = shows.map((s: Show) => s.id === id ? updatedShow : s);
-        localStorage.setItem('shows', JSON.stringify(updatedShows));
-        // reload the page
-        window.location.reload();
-    }
+	function getVideoFiles(files: FileList) {
+		// add the video files to the episodes
+		const updatedShow = updateEpisodesWithVideoFiles(show, files);
+		if (typeof updatedShow === "string") {
+			console.error(updatedShow);
+		} else {
+			// update the show in the local storage
+			const updatedShows = shows.map((show: Show) =>
+				show.id === id ? updatedShow : show
+			);
+			localStorage.setItem("shows", JSON.stringify(updatedShows));
+			// set the show in the state
+			setSelectedShow(updatedShow);
+			console.log("Show updated with video files");
+		}
+	}
 
-    return (
-        <>
-            <div className='flex items-center'>
-                <div className='bg-background rounded-lg cursor-pointer w-[56px]' onClick={() => setSelectedShow(null)}>
-                    <ArrowBackIcon className='text-white m-4' />
-                </div>
-                <h1 className='text-3xl font-semibold w-full text-center mr-[56px]'>{ show.name }</h1>
-            </div>
-            <div className='flex justify-between max-w-[1000px] mx-auto'>
-                <div className='text-xl py-10 flex flex-col justify-center'>
-                    <h2><span className='font-semibold'>Genre:</span> {show.genre}</h2>
-                    <h2><span className='font-semibold'>Rating:</span> {show.rating}</h2>
-                    <h2><span className='font-semibold'>Amount of Seasons:</span> {show.seasons.length}</h2>
-                </div>
-                <div className='h-[250px] flex'>
-                    <CustomImage src={show.image} alt="show poster" className='rounded-lg h-full max-w-none mx-auto' />
-                </div>
-            </div>
-            {!show.finalized ? (
-                <>
-                    <div className='max-w-[1000px] mx-auto flex flex-col items-center'>
-                        <h1 className='text-2xl text-center font-medium mb-4 text-red-500'>This show doesn't have valid video files</h1>
-                        <div>
-                            <SelectFiles getVideoFiles={getVideoFiles}  />
-                        </div>
-                    </div>
-                </>
-            ) : (
-                <div className='max-w-[1000px] mx-auto'>
-                    <h1 className='text-2xl text-center font-medium mb-4'>Watch Now</h1>
-                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-                        {show.seasons.map((season: Season) => (
-                            <SeasonItem key={season.number} showId={id} season={season} setSelectedSeason={setSelectedSeason} />
-                        ))}
-                    </div>
-                </div>
-            )}
-        </>
-    );
+	return (
+		<>
+			<div className='flex items-center'>
+				<div
+					className='bg-background rounded-lg cursor-pointer w-[56px]'
+					onClick={() => setSelectedShow(null)}
+				>
+					<ArrowBackIcon className='text-white m-4' />
+				</div>
+				<h1 className='text-3xl font-semibold w-full text-center mr-[56px]'>
+					{show.name}
+				</h1>
+			</div>
+			<div className='flex justify-between max-w-[1000px] mx-auto'>
+				<div className='text-xl py-10 flex flex-col justify-center'>
+					<h2>
+						<span className='font-semibold'>Genre:</span>{" "}
+						{show.genre}
+					</h2>
+					<h2>
+						<span className='font-semibold'>Rating:</span>{" "}
+						{show.rating}
+					</h2>
+					<h2>
+						<span className='font-semibold'>
+							Amount of Seasons:
+						</span>{" "}
+						{show.seasons.length}
+					</h2>
+				</div>
+				<div className='h-[250px] flex'>
+					<CustomImage
+						src={show.image}
+						alt='show poster'
+						className='rounded-lg h-full max-w-none mx-auto'
+					/>
+				</div>
+			</div>
+			{!show.finalized ? (
+				<>
+					<div className='max-w-[1000px] mx-auto flex flex-col items-center'>
+						<h1 className='text-2xl text-center font-medium mb-4 text-red-500'>
+							This show doesn't have valid video files
+						</h1>
+						<div>
+							<SelectFiles getVideoFiles={getVideoFiles} />
+						</div>
+					</div>
+				</>
+			) : (
+				<div className='max-w-[1000px] mx-auto'>
+					<h1 className='text-2xl text-center font-medium mb-4'>
+						Watch Now
+					</h1>
+					<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+						{show.seasons.map((season: Season) => (
+							<SeasonItem
+								key={season.number}
+								showId={id}
+								season={season}
+								setSelectedSeason={setSelectedSeason}
+							/>
+						))}
+					</div>
+				</div>
+			)}
+		</>
+	);
 }

@@ -79,7 +79,7 @@ export async function initializeShow(name: string){
                         });
                     });
                     // add the episode to the season
-                    season.episodes.push(new Episode(show.id, i, episodeData.Title, parseInt(episodeData.Runtime), episodePoster));
+                    season.episodes.push(new Episode(show.id, i, parseInt(episodeData.Episode), episodeData.Title, parseInt(episodeData.Runtime), episodePoster));
                     // if this is the first episode of the first season, set it as the selected episode
                     if(i === 1 && j === 1){
                         show.currentlyWatchingEpisode = season.episodes[0];

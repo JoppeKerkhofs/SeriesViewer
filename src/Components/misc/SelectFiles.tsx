@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 
 interface SelectFilesProps {
-    getVideoFiles: (path: string) => void;
+    getVideoFiles: (files: FileList) => void;
 }
 
 export default function SelectFiles(props: SelectFilesProps) {
@@ -24,14 +24,9 @@ export default function SelectFiles(props: SelectFilesProps) {
 
     const handleFilesSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
-        if (files && files.length > 0) {
-            // get the absolute path of the selected folder
-            let folderPath = files[0].path;
-            // remove everything after the last \ or / to get the folder path
-            const lastSlashIndex = folderPath.lastIndexOf('\\') || folderPath.lastIndexOf('/');
-            folderPath = folderPath.substring(0, lastSlashIndex);
-            console.log(folderPath);
-            getVideoFiles(folderPath);
+        if (files) {
+            console.log(files);
+            getVideoFiles(files);
         }
     };
 
