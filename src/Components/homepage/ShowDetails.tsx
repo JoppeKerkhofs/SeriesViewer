@@ -27,8 +27,16 @@ export default function ShowDetails(props: ShowDetailsProps) {
     const shows = JSON.parse(localStorage.getItem('shows') || '[]');
     const show = shows.find((show: Show) => show.id === id);
 
-    function getVideoFiles() {
-        updateEpisodesWithVideoFiles(show, baseDirName);
+    function getVideoFiles(path: string) {
+        console.log('Getting video files');
+        console.log(path);
+        setBaseDirName(path);
+        let updatedShow = updateEpisodesWithVideoFiles(show, path);
+        // update the show in the local storage
+        let updatedShows = shows.map((s: Show) => s.id === id ? updatedShow : s);
+        localStorage.setItem('shows', JSON.stringify(updatedShows));
+        // reload the page
+        window.location.reload();
     }
 
     return (
@@ -54,7 +62,7 @@ export default function ShowDetails(props: ShowDetailsProps) {
                     <div className='max-w-[1000px] mx-auto flex flex-col items-center'>
                         <h1 className='text-2xl text-center font-medium mb-4 text-red-500'>This show doesn't have valid video files</h1>
                         <div>
-                            <SelectFiles setBaseDirName={setBaseDirName} getVideoFiles={getVideoFiles}  />
+                            <SelectFiles getVideoFiles={getVideoFiles}  />
                         </div>
                     </div>
                 </>

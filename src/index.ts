@@ -24,6 +24,7 @@ const createWindow = (): void => {
     width: 2000,
     height: 1000,
     autoHideMenuBar: true,
+    icon: 'src/assets/images/logo.png',
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       nodeIntegration: true,

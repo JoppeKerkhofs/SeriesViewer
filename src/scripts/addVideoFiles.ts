@@ -8,7 +8,6 @@ import Show from '../Models/Show';
 // Function to recursively search for video files in a directory
 function findVideoFiles(directory: string): string[] {
     const items = fs.readdirSync(directory);
-    const videoExtensions = ['.mp4', '.avi', '.mkv', '.mov'];
     const videoFiles: string[] = [];
 
     items.forEach(item => {
@@ -31,20 +30,44 @@ function isVideoFile(filename: string): boolean {
 }
 
 // Function to update episode objects with video file paths
-export function updateEpisodesWithVideoFiles(show: Show, baseDirectory: string): void {
+export function updateEpisodesWithVideoFiles(show: Show, baseDirectory: string) {
     show.seasons.forEach(season => {
-        season.episodes.forEach(episode => {
+        season.episodes.forEach((episode, index) => {
             let episodeName = episode.name.toLowerCase().replace(/\s/g, '');
-            const videoFiles = findVideoFiles(baseDirectory);
+            let episodeCode = `S${String(season.number).padStart(2, '0')}E${String(index + 1).padStart(2, '0')}`;
 
-            const matchedVideoFile = videoFiles.find(file => {
+            // Look for 'S01E01' format first
+            const videoFiles = findVideoFiles(baseDirectory);
+            let matchedVideoFile = videoFiles.find(file => {
                 const filename = path.basename(file).toLowerCase().replace(/\s/g, '');
-                return filename.includes(episodeName);
+                return filename.includes(episodeCode);
             });
+
+            // If not found, then look for episode name
+            if (!matchedVideoFile) {
+                matchedVideoFile = videoFiles.find(file => {
+                    const filename = path.basename(file).toLowerCase().replace(/\s/g, '');
+                    return filename.includes(episodeName);
+                });
+            }
 
             if (matchedVideoFile) {
                 episode.path = matchedVideoFile;
             }
         });
     });
+
+    // check if all the episodes have a video file
+    const allEpisodesHaveVideoFile = show.seasons.every(season => season.episodes.every(episode => episode.path));
+    // if only some episodes have a video file, then the show is not finalized, and return an error message
+    if (!allEpisodesHaveVideoFile) {
+        console.error('Some episodes are missing video files');
+        // return an error message
+        return 'Some episodes are missing video files';
+    } else {
+        // if all episodes have a video file, then the show is finalized
+        show.finalized = true;
+        // return the show object
+        return show;
+    }
 }

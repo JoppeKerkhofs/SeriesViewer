@@ -93,3 +93,5 @@ out/
 
 # assets
 src/assets/*
+# Except for the images folder
+!src/assets/images/

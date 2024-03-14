@@ -1,29 +1,37 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 interface SelectFilesProps {
-    setBaseDirName: React.Dispatch<React.SetStateAction<string>>;
-    getVideoFiles: () => void;
+    getVideoFiles: (path: string) => void;
 }
 
 export default function SelectFiles(props: SelectFilesProps) {
-    const { setBaseDirName, getVideoFiles } = props;
-    const inputRef = useRef<HTMLInputElement>(null);
+    const { getVideoFiles } = props;
+    const ref = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (ref.current !== null) {
+            ref.current.setAttribute("directory", "");
+            ref.current.setAttribute("webkitdirectory", "");
+        }
+    }, [ref]);
 
     const handleFolderSelect = () => {
         // Trigger a click event on the input element to open the directory selection dialog
-        if (inputRef.current) {
-            inputRef.current.click();
+        if (ref.current) {
+            ref.current.click();
         }
     };
 
     const handleFilesSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
         if (files && files.length > 0) {
-            const folderPath = files[0].webkitRelativePath.split('/')[0];
-            // Save the selected folder path
-            setBaseDirName(folderPath);
-            // Get the video files from the selected folder
-            getVideoFiles();
+            // get the absolute path of the selected folder
+            let folderPath = files[0].path;
+            // remove everything after the last \ or / to get the folder path
+            const lastSlashIndex = folderPath.lastIndexOf('\\') || folderPath.lastIndexOf('/');
+            folderPath = folderPath.substring(0, lastSlashIndex);
+            console.log(folderPath);
+            getVideoFiles(folderPath);
         }
     };
 
@@ -31,7 +39,7 @@ export default function SelectFiles(props: SelectFilesProps) {
         <>
             <input
                 type='file'
-                ref={inputRef}
+                ref={ref}
                 style={{ display: 'none' }}
                 onChange={handleFilesSelected}
             />

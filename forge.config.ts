@@ -12,9 +12,10 @@ import { rendererConfig } from './webpack.renderer.config';
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
+    icon: './src/assets/images'
   },
   rebuildConfig: {},
-  makers: [new MakerSquirrel({}), new MakerZIP({}, ['darwin']), new MakerRpm({}), new MakerDeb({})],
+  makers: [new MakerSquirrel({}), new MakerZIP({}, ['darwin']), new MakerRpm({}), new MakerDeb({}), { name: '@electron-forge/maker-deb', config: { options: { icon: './src/assets/images/logo.png' } } }],
   plugins: [
     new AutoUnpackNativesPlugin({}),
     new WebpackPlugin({
