@@ -1,5 +1,6 @@
 import { app, BrowserWindow, protocol } from "electron";
 import { session, ipcMain } from "electron";
+import { initialize, enable } from "@electron/remote/main";
 import { URL } from "url";
 import fs from "fs";
 import path from "path";
@@ -31,6 +32,8 @@ const createWindow = (): void => {
 			contextIsolation: false,
 		},
 	});
+
+	enable(mainWindow.webContents);
 
 	// and load the index.html of the app.
 	mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
@@ -122,6 +125,8 @@ app.on("ready", () => {
 			return callback("404");
 		}
 	});
+
+	initialize();
 
 	// Create Window
 	createWindow();

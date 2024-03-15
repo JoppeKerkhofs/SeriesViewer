@@ -1,14 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
-import { withVue } from "vuera";
-import VlcVideoWrapper from "./VlcVideoWrapper.vue";
-
-// import needed models
 import Episode from "../../Models/Episode";
 import Show from "../../Models/Show";
-
-const VlcVideoComponent = withVue(VlcVideoWrapper);
 
 interface VideoProps {
 	episode: Episode;
@@ -21,8 +15,6 @@ export default function Video(props: VideoProps) {
 	const [currentTime, setCurrentTime] = useState<number | null>(
 		episode.currentTime
 	);
-	const [width, setWidth] = useState<number>(0);
-	const [height, setHeight] = useState<number>(0);
 	const [isPlaying, setIsPlaying] = useState(true);
 	const [isReady, setIsReady] = useState(false);
 	const [videoURL, setVideoURL] = useState<string>(
@@ -82,13 +74,30 @@ export default function Video(props: VideoProps) {
 	useEffect(() => {
 		const height = window.innerHeight - 172;
 		const width = height * (16 / 9);
-		setHeight(height);
-		setWidth(width);
-	}, []);
+
+		if (playerRef.current) {
+			const player = videojs(playerRef.current, {
+				controls: true,
+				autoplay: true,
+				muted: false,
+				height: height,
+				width: width,
+			});
+			player.src({ src: videoURL, type: "video/x-matroska" });
+
+			player.on("timeupdate", handleProgress);
+			player.on("ended", handleEnded);
+			player.on("ready", onReady);
+
+			return () => {
+				player.dispose();
+			};
+		}
+	}, [videoURL]);
 
 	return (
 		<div className='mt-3 flex justify-center'>
-			<VlcVideoComponent src={videoURL} width={width} height={height} />
+			<video ref={playerRef} className='video-js vjs-big-play-centered' />
 		</div>
 	);
 }
