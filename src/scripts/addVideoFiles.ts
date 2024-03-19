@@ -71,6 +71,9 @@ export function updateEpisodesWithVideoFiles(
 		) {
 			console.log("Show has mkv files, converting to mp4");
 			convertMKVFiles(show, setIsLoading);
+		} else {
+			show.finalized = true;
+			setIsLoading(false);
 		}
 		return show;
 	}

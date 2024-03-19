@@ -27,5 +27,4 @@
  */
 
 import "./index.css";
-import "@vidstack/react/player/styles/base.css";
 import "./Components/App";

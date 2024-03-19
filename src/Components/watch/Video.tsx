@@ -1,16 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-	type MediaCanPlayDetail,
-	type MediaCanPlayEvent,
-	MediaPlayer,
-	type MediaPlayerInstance,
-	MediaProvider,
-	type MediaProviderAdapter,
-	type MediaProviderChangeEvent,
-	isHLSProvider,
-	Track,
-	Poster,
-} from "@vidstack/react";
+import videojs from "video.js";
+import "video.js/dist/video-js.css";
 
 // import needed models
 import Episode from "../../Models/Episode";
@@ -32,13 +22,15 @@ export default function Video(props: VideoProps) {
 	const [videoURL, setVideoURL] = useState<string>(
 		"media-loader://" + episode.path
 	);
-	let player = useRef<MediaPlayerInstance>(null);
+	const playerRef = useRef<HTMLVideoElement | null>(null);
 
 	// Function to handle progress updates
 	const handleProgress = (event: Event) => {
-		const target = event.target as HTMLVideoElement;
-		setCurrentTime(target.currentTime);
-		console.log("Progress: ", target.currentTime);
+		if (playerRef.current) {
+			setCurrentTime(playerRef.current.currentTime);
+			episode.currentTime = playerRef.current.currentTime;
+			saveEpisode(episode);
+		}
 	};
 
 	// Function to save episode to local storage
@@ -74,9 +66,10 @@ export default function Video(props: VideoProps) {
 		if (!isReady && currentTime) {
 			let timeToStart = currentTime - 10;
 			if (timeToStart < 0) timeToStart = 0;
-			player.current!.currentTime = timeToStart;
-			setCurrentTime(timeToStart);
-			setIsReady(true);
+			if (playerRef.current) {
+				playerRef.current.currentTime = timeToStart;
+				setIsReady(true);
+			}
 		}
 	}, [isReady, currentTime]);
 
@@ -84,62 +77,29 @@ export default function Video(props: VideoProps) {
 		const height = window.innerHeight - 172;
 		const width = height * (16 / 9);
 
-		// create a style class for the video player using the calculated width and height
-		const style = document.createElement("style");
-		style.type = "text/css";
-		style.innerHTML = `
-			.video-player {
-				width: ${width}px;
-				height: ${height}px;
-			}
-		`;
-		// add the style to the head of the document
-		document.head.appendChild(style);
+		if (playerRef.current) {
+			const player = videojs(playerRef.current, {
+				controls: true,
+				autoplay: true,
+				muted: false,
+				height: height,
+				width: width,
+			});
+			player.src({ src: videoURL, type: "video/mp4" });
 
-		// Subscribe to state updates.
-		return player.current!.subscribe(({ paused, currentTime }) => {
-			console.log("is paused?", "->", paused.valueOf());
-			console.log("current time", "->", currentTime);
-		});
-	}, []);
+			player.on("timeupdate", handleProgress);
+			player.on("ended", handleEnded);
+			player.on("ready", onReady);
 
-	// We can listen for the `can-play` event to be notified when the player is ready.
-	function onCanPlay(
-		detail: MediaCanPlayDetail,
-		nativeEvent: MediaCanPlayEvent
-	) {
-		console.log("Can play", detail, nativeEvent);
-	}
-
-	function onProviderChange(
-		provider: MediaProviderAdapter | null,
-		nativeEvent: MediaProviderChangeEvent
-	) {
-		// We can configure provider's here.
-		if (isHLSProvider(provider)) {
-			provider.config = {};
+			return () => {
+				player.dispose();
+			};
 		}
-	}
+	}, [videoURL]);
 
 	return (
 		<div className='mt-3 flex justify-center'>
-			<MediaPlayer
-				className='video-player'
-				title={episode.name}
-				src={videoURL}
-				crossOrigin
-				playsInline
-				onCanPlay={onCanPlay}
-				onPlay={() => console.log("Play")}
-				onPause={() => console.log("Pause")}
-				onEnded={handleEnded}
-				controls
-				preload={"auto"}
-				ref={player}
-				aspectRatio='16/9'
-			>
-				<MediaProvider />
-			</MediaPlayer>
+			<video ref={playerRef} className='video-js vjs-big-play-centered' />
 		</div>
 	);
 }
