@@ -1,6 +1,6 @@
 import { app, BrowserWindow, protocol } from "electron";
 import { session, ipcMain } from "electron";
-import { initialize, enable } from "@electron/remote/main";
+import si from "systeminformation";
 import { URL } from "url";
 import fs from "fs";
 import path from "path";
@@ -32,8 +32,6 @@ const createWindow = (): void => {
 			contextIsolation: false,
 		},
 	});
-
-	enable(mainWindow.webContents);
 
 	// and load the index.html of the app.
 	mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
@@ -100,6 +98,21 @@ const createWindow = (): void => {
 			event.reply(`load-local-file-${requestId}`, "error");
 		}
 	});
+
+	ipcMain.on("check-nvidia-gpu", (event) => {
+		// check if the device has a nvidia gpu
+		si.graphics().then((data) => {
+			if (
+				data.controllers.some(
+					(controller) => controller.vendor === "NVIDIA"
+				)
+			) {
+				event.reply("check-nvidia-gpu", true);
+			} else {
+				event.reply("check-nvidia-gpu", false);
+			}
+		});
+	});
 };
 
 app.on("ready", () => {
@@ -125,8 +138,6 @@ app.on("ready", () => {
 			return callback("404");
 		}
 	});
-
-	initialize();
 
 	// Create Window
 	createWindow();

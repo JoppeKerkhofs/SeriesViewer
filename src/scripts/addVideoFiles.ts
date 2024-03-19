@@ -6,6 +6,9 @@ import path from "path";
 import Show from "../Models/Show";
 import { VideoFile } from "../Models/videoFile";
 
+// import needed functions
+import { convertMKVFiles } from "./convertVideo";
+
 // Function to check if a file is a video file
 function isVideoFile(filename: string): boolean {
 	const videoExtensions = [".mp4", ".avi", ".mkv", ".mov"];
@@ -16,7 +19,8 @@ function isVideoFile(filename: string): boolean {
 // Function to update episode objects with video file paths
 export function updateEpisodesWithVideoFiles(
 	show: Show,
-	files: Array<VideoFile>
+	files: Array<VideoFile>,
+	setIsLoading: (isLoading: boolean) => void
 ): Show | string {
 	console.log("Updating episodes with video files for show:", show.name);
 
@@ -59,8 +63,15 @@ export function updateEpisodesWithVideoFiles(
 	if (!checkIfAllEpisodesHaveVideoFiles(show)) {
 		return "Not all episodes have video files";
 	} else {
-		// set the show to finalized
-		show.finalized = true;
+		// check if the show has mkv files, if so, convert them to mp4
+		if (
+			show.seasons.some((season) =>
+				season.episodes.some((episode) => isMKVFile(episode.path))
+			)
+		) {
+			console.log("Show has mkv files, converting to mp4");
+			convertMKVFiles(show, setIsLoading);
+		}
 		return show;
 	}
 }
@@ -85,4 +96,10 @@ function checkIfAllEpisodesHaveVideoFiles(show: Show): boolean {
 	} else {
 		return true;
 	}
+}
+
+// check if the video file is in .mkv format
+export function isMKVFile(filename: string): boolean {
+	const ext = path.extname(filename).toLowerCase();
+	return ext === ".mkv";
 }

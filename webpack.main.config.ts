@@ -19,10 +19,7 @@ export const mainConfig: Configuration = {
 			fs: false,
 			path: false,
 		},
-		extensions: [".js", ".ts", ".jsx", ".tsx", ".css", ".vue"],
-		alias: {
-			vue$: "vue/dist/vue.esm.js",
-		},
+		extensions: [".js", ".ts", ".jsx", ".tsx", ".css"],
 	},
 	externals: {
 		electron: "commonjs electron",

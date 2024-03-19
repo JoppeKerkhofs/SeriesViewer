@@ -10,9 +10,11 @@ import { VideoFile } from "../../Models/videoFile";
 import CustomImage from "../misc/CustomImage";
 import SeasonItem from "./details/SeasonItem";
 import SelectFiles from "../misc/SelectFiles";
+import Loading from "../misc/Loading";
 
 // import scripts
 import { updateEpisodesWithVideoFiles } from "../../scripts/addVideoFiles";
+import { set } from "video.js/dist/types/tech/middleware";
 
 interface ShowDetailsProps {
 	id: string;
@@ -22,7 +24,7 @@ interface ShowDetailsProps {
 
 export default function ShowDetails(props: ShowDetailsProps) {
 	const { id, setSelectedShow, setSelectedSeason } = props;
-	const [baseDirName, setBaseDirName] = useState<string>("");
+	const [isLoading, setIsLoading] = useState<boolean>(false);
 
 	// get the show from the local storage
 	const shows = JSON.parse(localStorage.getItem("shows") || "[]");
@@ -30,7 +32,11 @@ export default function ShowDetails(props: ShowDetailsProps) {
 
 	function getVideoFiles(files: Array<VideoFile>) {
 		// add the video files to the episodes
-		const updatedShow = updateEpisodesWithVideoFiles(show, files);
+		const updatedShow = updateEpisodesWithVideoFiles(
+			show,
+			files,
+			setIsLoading
+		);
 		if (typeof updatedShow === "string") {
 			console.error(updatedShow);
 		} else {
@@ -84,16 +90,23 @@ export default function ShowDetails(props: ShowDetailsProps) {
 				</div>
 			</div>
 			{!show.finalized ? (
-				<>
-					<div className='max-w-[1000px] mx-auto flex flex-col items-center'>
-						<h1 className='text-2xl text-center font-medium mb-4 text-red-500'>
-							This show doesn't have valid video files
-						</h1>
-						<div>
-							<SelectFiles getVideoFiles={getVideoFiles} />
+				isLoading ? (
+					<Loading message='Loading... Please wait.' />
+				) : (
+					<>
+						<div className='max-w-[1000px] mx-auto flex flex-col items-center'>
+							<h1 className='text-2xl text-center font-medium mb-4 text-red-500'>
+								This show doesn't have valid video files
+							</h1>
+							<div>
+								<SelectFiles
+									getVideoFiles={getVideoFiles}
+									setIsLoading={setIsLoading}
+								/>
+							</div>
 						</div>
-					</div>
-				</>
+					</>
+				)
 			) : (
 				<div className='max-w-[1000px] mx-auto'>
 					<h1 className='text-2xl text-center font-medium mb-4'>

@@ -1,14 +1,20 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import videojs from "video.js";
-import "video.js/dist/video-js.css";
-import { withVue } from "vuera";
-import VlcVideoWrapper from "./VlcVideoWrapper.vue";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import {
+	type MediaCanPlayDetail,
+	type MediaCanPlayEvent,
+	MediaPlayer,
+	type MediaPlayerInstance,
+	MediaProvider,
+	type MediaProviderAdapter,
+	type MediaProviderChangeEvent,
+	isHLSProvider,
+	Track,
+	Poster,
+} from "@vidstack/react";
 
 // import needed models
 import Episode from "../../Models/Episode";
 import Show from "../../Models/Show";
-
-const VlcVideoComponent = withVue(VlcVideoWrapper);
 
 interface VideoProps {
 	episode: Episode;
@@ -21,22 +27,18 @@ export default function Video(props: VideoProps) {
 	const [currentTime, setCurrentTime] = useState<number | null>(
 		episode.currentTime
 	);
-	const [width, setWidth] = useState<number>(0);
-	const [height, setHeight] = useState<number>(0);
 	const [isPlaying, setIsPlaying] = useState(true);
 	const [isReady, setIsReady] = useState(false);
 	const [videoURL, setVideoURL] = useState<string>(
 		"media-loader://" + episode.path
 	);
-	const playerRef = useRef<HTMLVideoElement | null>(null);
+	let player = useRef<MediaPlayerInstance>(null);
 
 	// Function to handle progress updates
 	const handleProgress = (event: Event) => {
-		if (playerRef.current) {
-			setCurrentTime(playerRef.current.currentTime);
-			episode.currentTime = playerRef.current.currentTime;
-			saveEpisode(episode);
-		}
+		const target = event.target as HTMLVideoElement;
+		setCurrentTime(target.currentTime);
+		console.log("Progress: ", target.currentTime);
 	};
 
 	// Function to save episode to local storage
@@ -72,23 +74,72 @@ export default function Video(props: VideoProps) {
 		if (!isReady && currentTime) {
 			let timeToStart = currentTime - 10;
 			if (timeToStart < 0) timeToStart = 0;
-			if (playerRef.current) {
-				playerRef.current.currentTime = timeToStart;
-				setIsReady(true);
-			}
+			player.current!.currentTime = timeToStart;
+			setCurrentTime(timeToStart);
+			setIsReady(true);
 		}
 	}, [isReady, currentTime]);
 
 	useEffect(() => {
 		const height = window.innerHeight - 172;
 		const width = height * (16 / 9);
-		setHeight(height);
-		setWidth(width);
+
+		// create a style class for the video player using the calculated width and height
+		const style = document.createElement("style");
+		style.type = "text/css";
+		style.innerHTML = `
+			.video-player {
+				width: ${width}px;
+				height: ${height}px;
+			}
+		`;
+		// add the style to the head of the document
+		document.head.appendChild(style);
+
+		// Subscribe to state updates.
+		return player.current!.subscribe(({ paused, currentTime }) => {
+			console.log("is paused?", "->", paused.valueOf());
+			console.log("current time", "->", currentTime);
+		});
 	}, []);
+
+	// We can listen for the `can-play` event to be notified when the player is ready.
+	function onCanPlay(
+		detail: MediaCanPlayDetail,
+		nativeEvent: MediaCanPlayEvent
+	) {
+		console.log("Can play", detail, nativeEvent);
+	}
+
+	function onProviderChange(
+		provider: MediaProviderAdapter | null,
+		nativeEvent: MediaProviderChangeEvent
+	) {
+		// We can configure provider's here.
+		if (isHLSProvider(provider)) {
+			provider.config = {};
+		}
+	}
 
 	return (
 		<div className='mt-3 flex justify-center'>
-			<VlcVideoComponent src={videoURL} width={width} height={height} />
+			<MediaPlayer
+				className='video-player'
+				title={episode.name}
+				src={videoURL}
+				crossOrigin
+				playsInline
+				onCanPlay={onCanPlay}
+				onPlay={() => console.log("Play")}
+				onPause={() => console.log("Pause")}
+				onEnded={handleEnded}
+				controls
+				preload={"auto"}
+				ref={player}
+				aspectRatio='16/9'
+			>
+				<MediaProvider />
+			</MediaPlayer>
 		</div>
 	);
 }

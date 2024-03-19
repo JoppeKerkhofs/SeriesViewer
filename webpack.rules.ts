@@ -34,8 +34,4 @@ export const rules: Required<ModuleOptions>["rules"] = [
 		include: [path.resolve(__dirname, "assets/posters")],
 		type: "asset/inline",
 	},
-	{
-		test: /\.vue$/,
-		use: "vue-loader",
-	},
 ];

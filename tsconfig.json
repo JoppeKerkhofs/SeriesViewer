@@ -16,5 +16,5 @@
 			"*": ["node_modules/*"]
 		}
 	},
-	"include": ["src/**/*", "vuera.d.ts", "components/**/*", "utils/**/*"]
+	"include": ["src/**/*", "components/**/*", "utils/**/*"]
 }
